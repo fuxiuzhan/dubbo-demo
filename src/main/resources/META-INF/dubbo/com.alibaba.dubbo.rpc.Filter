@@ -1,0 +1,2 @@
+myfilter=com.fxz.demo.filter.StaticsFilter
+logfilter=com.fxz.demo.filter.LogFilter
