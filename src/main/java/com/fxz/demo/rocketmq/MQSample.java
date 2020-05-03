@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
+//@Component
 public class MQSample implements ApplicationRunner {
     @Autowired
     DefaultMQPushConsumer defaultMQPushConsumer;
