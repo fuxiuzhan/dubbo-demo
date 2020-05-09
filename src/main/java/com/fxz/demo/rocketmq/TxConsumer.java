@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
+//@Component
 public class TxConsumer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {

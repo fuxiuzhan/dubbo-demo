@@ -4,9 +4,9 @@ import com.alibaba.dubbo.config.ConsumerConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class DubboConfig {
-    //@Bean
+    @Bean
     public ConsumerConfig getConsulmerConfig() {
         ConsumerConfig consumerConfig = new ConsumerConfig();
         consumerConfig.setCheck(false);

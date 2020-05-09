@@ -1,5 +1,8 @@
 package com.fxz.demo.controller;
 
+import com.alibaba.csp.sentinel.Entry;
+import com.alibaba.csp.sentinel.SphU;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.fxz.demo.service.MessageProccess;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +23,32 @@ public class ClientController {
 
     @GetMapping("/test")
     public String test() {
-        return messageProccess.process("process_test");
+        Entry entry = null;
+        try {
+            entry = SphU.entry("web-ctl-test");
+            return messageProccess.process("process_test");
+        } catch (BlockException e) {
+            return e.getMessage();
+        } finally {
+            if (entry != null) {
+                entry.exit();
+            }
+        }
+
+    }
+
+    @GetMapping("/sentinel")
+    public String testSentinel() {
+        Entry entry = null;
+        try {
+            entry = SphU.entry("testSentinel");
+            return "ok";
+        } catch (BlockException e) {
+            return e.getMessage();
+        } finally {
+            if (entry != null) {
+                entry.exit();
+            }
+        }
     }
 }

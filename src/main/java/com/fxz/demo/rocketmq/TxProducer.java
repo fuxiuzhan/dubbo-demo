@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author fxz
  */
-@Component
+//@Component
 public class TxProducer implements ApplicationRunner {
     @Autowired
     TransactionMQProducer transactionMQProducer;
@@ -32,7 +32,7 @@ public class TxProducer implements ApplicationRunner {
                     public LocalTransactionState executeLocalTransaction(Message message, Object o) {
                         if (message.getTransactionId().hashCode() % 2 == 0) {
                             System.out.println("message commit->" + JSON.toJSONString(message));
-                            return LocalTransactionState.COMMIT_MESSAGE;
+                            return LocalTransactionState.UNKNOW;
                         } else {
                             System.out.println("message unkonw->" + JSON.toJSONString(message));
                             return LocalTransactionState.UNKNOW;
