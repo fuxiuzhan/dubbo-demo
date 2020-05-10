@@ -1,18 +1,24 @@
 package com.fxz.demo.test;
 
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @author fxz
+ */
 public class ExecutorSignal {
+    static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 4, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(9/**根据线程池的特点，此处如果未10的话线程池就会卡主*/));
+
     public static void main(String[] args) {
         AtomicInteger atomicInteger = new AtomicInteger(4);
-        testExec(atomicInteger);
+        test();
     }
 
     static void testExec(AtomicInteger atomicInteger) {
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(2, 4, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
         /**
          * 如果使用countDownLatch，则需要使用新线程启动如下过程，让所有线程在同一重点，
          * 最终标识整个过程完结
@@ -53,5 +59,44 @@ public class ExecutorSignal {
         }
         System.out.println("final->" + atomicInteger.get());
         threadPoolExecutor.shutdown();
+    }
+
+    static AtomicBoolean running = new AtomicBoolean(false);
+
+    public static void test() {
+        if (running.compareAndSet(false, true)) {
+            threadPoolExecutor.execute(new Thread() {
+                @Override
+                public void run() {
+                    CountDownLatch countDownLatch = new CountDownLatch(10);
+                    for (int i = 0; i < 10; i++) {
+                        int finalI = i;
+                        threadPoolExecutor.execute(new Thread() {
+                            @Override
+                            public void run() {
+                                setName("thread-" + finalI);
+                                try {
+                                    Thread.sleep(1000);
+                                    System.out.println(getName() + " exit");
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                countDownLatch.countDown();
+                                System.out.println(getName() + "countdown");
+                            }
+                        });
+                    }
+                    try {
+                        System.out.println("await......");
+                        countDownLatch.await();
+                        System.out.println("await complete");
+                    } catch (InterruptedException e) {
+                    } finally {
+                        running.compareAndSet(true, false);
+                        System.out.println("running->" + running.get());
+                    }
+                }
+            });
+        }
     }
 }
